@@ -1,3 +1,5 @@
+#functions
+
 from calculator import addition, multiplication, subtraction
 
 print("Addition of 5 and 3 is:", addition(5, 3))
