@@ -32,9 +32,7 @@ This project demonstrates how LLMs can be guided using well-structured prompts t
 
 ## Sample Run of Interview Coach
 
-=======================================================
 🎯 Welcome to AI Interview Coach
-=======================================================
 
 Enter your name: Mayur
 Enter target job role: Backend Developer
