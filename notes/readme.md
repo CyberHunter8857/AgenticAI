@@ -1,0 +1,680 @@
+# 📝 Agentic AI Bootcamp — Day-by-Day Notes
+
+> Quick-reference notes for every day of the bootcamp.
+> Each section covers **what was learned**, **simple definitions**, and **code examples**.
+
+---
+
+## 📅 Table of Contents
+
+| Day | Topic |
+|-----|-------|
+| [Day 1](#day-1--python-basics--oop) | Python Basics & OOP |
+| [Day 2](#day-2--apis-json--exception-handling) | APIs, JSON & Exception Handling |
+| [Day 3](#day-3--first-ai-chatbot-gemini-api) | First AI Chatbot (Gemini API) |
+| [Day 4](#day-4--prompt-engineering) | Prompt Engineering |
+| [Day 5](#day-5--structured-outputs-json-from-llms) | Structured Outputs (JSON from LLMs) |
+| [Day 6](#day-6--stateful-chatbot-with-persistent-memory) | Stateful Chatbot with Persistent Memory |
+
+---
+
+## Day 1 — Python Basics & OOP
+
+### What was built
+
+- A "Hello World" script
+- Functions and Classes
+- A **Student Profile Manager** (mini project)
+
+### Key Concepts
+
+#### 1. Print Statement
+
+The simplest way to show output in Python.
+
+```python
+print("Hello Agentic AI!")
+```
+
+#### 2. Variables
+
+A variable stores a value so you can use it later.
+
+```python
+name = "Mayur"
+age = 22
+print(name)  # Output: Mayur
+```
+
+#### 3. Data Types
+
+| Type   | Example              | Description           |
+|--------|----------------------|-----------------------|
+| `str`  | `"Hello"`            | Text                  |
+| `int`  | `22`                 | Whole number          |
+| `float`| `3.14`               | Decimal number        |
+| `list` | `["Python", "Java"]` | Ordered collection    |
+| `dict` | `{"name": "Mayur"}`  | Key-value pairs       |
+| `bool` | `True` / `False`     | True or False         |
+
+#### 4. Lists
+
+A list is an ordered, changeable collection of items.
+
+```python
+languages = ["Python", "JavaScript", "C++", "Java"]
+
+# Loop through a list
+for i, lang in enumerate(languages, start=1):
+    print(f"{i}. {lang}")
+```
+
+**Output:**
+```
+1. Python
+2. JavaScript
+3. C++
+4. Java
+```
+
+#### 5. Dictionaries
+
+A dictionary stores data as **key-value** pairs (like a real dictionary: word → definition).
+
+```python
+student = {
+    "name": "Mayur",
+    "age": 22,
+    "branch": "E&TC"
+}
+
+print(student["name"])  # Output: Mayur
+```
+
+#### 6. Functions
+
+A function is a reusable block of code that performs a specific task.
+
+```python
+def add(a, b):
+    return a + b
+
+result = add(5, 3)
+print(result)  # Output: 8
+```
+
+#### 7. Classes & Objects (OOP)
+
+A **class** is a blueprint for creating objects. An **object** is an instance of a class.
+
+```python
+class Student:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def greet(self):
+        print(f"Hello, my name is {self.name} and I am {self.age} years old.")
+
+# Create an object
+student = Student("Mayur", 22)
+student.greet()
+```
+
+**Output:**
+```
+Hello, my name is Mayur and I am 22 years old.
+```
+
+**Key OOP Terms:**
+| Term          | Meaning                                                 |
+|---------------|----------------------------------------------------------|
+| `class`       | A blueprint/template for objects                         |
+| `object`      | An instance created from a class                         |
+| `__init__`    | Constructor — runs automatically when an object is created |
+| `self`        | Refers to the current object itself                      |
+| `method`      | A function defined inside a class                        |
+
+#### 8. f-Strings
+
+An easy way to insert variables into strings.
+
+```python
+name = "Mayur"
+age = 22
+print(f"I am {name} and I am {age} years old.")
+```
+
+---
+
+## Day 2 — APIs, JSON & Exception Handling
+
+### What was built
+
+- A calculator module (importing functions)
+- Exception handling examples
+- JSON parsing examples
+- A **GitHub Profile Analyzer** (mini project)
+
+### Key Concepts
+
+#### 1. Modules & Imports
+
+A **module** is just a `.py` file. You can import functions from one file into another.
+
+```python
+# calculator.py
+def addition(a, b):
+    return a + b
+
+# main.py
+from calculator import addition
+print(addition(5, 3))  # Output: 8
+```
+
+#### 2. Exception Handling (`try` / `except`)
+
+Exceptions are errors that happen while running code. Instead of crashing, you can **catch** them.
+
+```python
+try:
+    number = int(input("Enter a number: "))
+    result = 100 / number
+    print("Result:", result)
+except ZeroDivisionError:
+    print("Error: Cannot divide by zero!")
+except ValueError:
+    print("Error: Please enter a valid number!")
+```
+
+**Why?** Without `try/except`, your program crashes. With it, the program shows a friendly message instead.
+
+#### 3. JSON (JavaScript Object Notation)
+
+JSON is a format for storing and exchanging data. It looks like a Python dictionary.
+
+```python
+import json
+
+# Python dict → JSON string (dumps)
+student = {"Name": "Mayur", "Age": 21}
+json_string = json.dumps(student)
+print(json_string)         # '{"Name": "Mayur", "Age": 21}'
+print(type(json_string))   # <class 'str'>
+
+# JSON string → Python dict (loads)
+data = json.loads(json_string)
+print(data["Name"])        # Mayur
+print(type(data))          # <class 'dict'>
+```
+
+**Remember:**
+| Function      | Direction                     | Think of it as        |
+|---------------|-------------------------------|-----------------------|
+| `json.dumps()`| Python → JSON string          | **d**ump to **s**tring|
+| `json.loads()`| JSON string → Python          | **l**oad from **s**tring|
+
+#### 4. REST API
+
+An **API** (Application Programming Interface) lets your code talk to other services over the internet.
+
+```
+Your Python Code  →  HTTP Request  →  Server  →  JSON Response  →  Your Code
+```
+
+```python
+import requests
+
+response = requests.get("https://api.github.com/users/CyberHunter8857")
+
+if response.status_code == 200:
+    data = response.json()
+    print(data["name"])       # Mayur Tamanke
+    print(data["followers"])  # 5
+else:
+    print("User not found")
+```
+
+**Common HTTP Status Codes:**
+| Code | Meaning          |
+|------|------------------|
+| 200  | ✅ OK (Success)  |
+| 404  | ❌ Not Found     |
+| 500  | 💥 Server Error  |
+
+#### 5. Environment Variables
+
+Store secret values (API keys, passwords) outside your code using a `.env` file.
+
+```bash
+# .env file
+GOOGLE_API_KEY=your_secret_key_here
+```
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Loads .env file
+
+api_key = os.getenv("GOOGLE_API_KEY")
+print(api_key)  # your_secret_key_here
+```
+
+**Why?** Never put API keys directly in your code — anyone who sees your code would see your key.
+
+---
+
+## Day 3 — First AI Chatbot (Gemini API)
+
+### What was built
+
+A **terminal chatbot** using Google Gemini API that:
+- Chats in a loop
+- Maintains conversation history in memory
+- Saves the full conversation to a text file on exit
+
+### Key Concepts
+
+#### 1. What is an LLM?
+
+A **Large Language Model** (LLM) is an AI trained on massive text data that can understand and generate human language. Examples: Gemini, GPT, Claude.
+
+#### 2. Google Gemini API Setup
+
+```python
+from google import genai
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+```
+
+#### 3. Making Your First AI Call
+
+```python
+response = client.models.generate_content(
+    model="gemini-3.5-flash",
+    contents="What is Python?"
+)
+
+print(response.text)
+```
+
+This sends your text to Google's AI and gets back a response — like texting a very smart assistant.
+
+#### 4. Conversation History (Context)
+
+LLMs don't remember past messages by default. To have a conversation, you send **all previous messages** with each new request.
+
+```python
+history = []
+
+while True:
+    user_input = input("You: ")
+    if user_input == "exit":
+        break
+
+    history.append(f"User: {user_input}")
+
+    # Send full history as one prompt
+    prompt = "\n".join(history)
+
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=prompt
+    )
+
+    ai_reply = response.text
+    print("AI:", ai_reply)
+
+    history.append(f"AI: {ai_reply}")
+```
+
+**How it works:**
+```
+Turn 1: "Hi"                         → AI: "Hello!"
+Turn 2: "Hi\nAI: Hello!\nUser: What is Python?" → AI: "Python is..."
+```
+
+Each turn sends the **entire conversation** so the AI knows what was said before.
+
+#### 5. Saving to a File
+
+```python
+with open("chat_history.txt", "w", encoding="utf-8") as file:
+    file.write("\n".join(history))
+```
+
+---
+
+## Day 4 — Prompt Engineering
+
+### What was built
+
+- An **AI Resume Reviewer**
+- An **AI Interview Coach** (main project)
+
+### Key Concepts
+
+#### 1. What is Prompt Engineering?
+
+Prompt Engineering is the skill of writing clear, structured instructions to get the best output from an AI model.
+
+**Bad prompt:** `"Review my resume"`
+**Good prompt:** `"Review this resume. Give: 1. Score /10, 2. Top 3 strengths, 3. Top 3 weaknesses"`
+
+#### 2. Prompt Formula
+
+```
+Role + Task + Context + Constraints = Good Prompt
+```
+
+| Part        | Example                                       |
+|-------------|-----------------------------------------------|
+| **Role**    | "You are a Python mentor."                    |
+| **Task**    | "Explain dictionaries."                       |
+| **Context** | "I'm a third-year engineering student."       |
+| **Constraints** | "Use simple English and one real-life example." |
+
+#### 3. System Instruction
+
+A **system instruction** tells the AI *who it should act as* before the conversation starts. It sets the AI's personality and behavior.
+
+```python
+from google.genai import types
+
+response = client.models.generate_content(
+    model="gemini-3.5-flash",
+    contents="Review this resume...",
+    config=types.GenerateContentConfig(
+        system_instruction="You are a senior software recruiter."
+    )
+)
+```
+
+**Without system instruction:** AI answers as a generic assistant.
+**With system instruction:** AI answers as a recruiter, giving scores, strengths, weaknesses.
+
+#### 4. Dynamic Prompts
+
+Build prompts that change based on user input using f-strings.
+
+```python
+role = input("Enter target job role: ")
+question = input("Interview Question: ")
+answer = input("Your Answer: ")
+
+prompt = f"""
+You are interviewing a candidate for the role of {role}.
+
+Interview Question:
+{question}
+
+Candidate's Answer:
+{answer}
+
+Evaluate and provide:
+1. Score out of 10
+2. What was good (3 points)
+3. What can be improved (3 points)
+4. A better sample answer (max 80 words)
+"""
+```
+
+**Key idea:** The prompt template stays the same, but the values change every time.
+
+#### 5. Structured Prompt Output
+
+Tell the AI exactly **what format** you want:
+
+```python
+prompt = """
+Give:
+1. Score /10
+2. Top 3 strengths
+3. Top 3 weaknesses
+4. Missing technical skills
+"""
+```
+
+This makes AI output consistent and predictable every time.
+
+---
+
+## Day 5 — Structured Outputs (JSON from LLMs)
+
+### What was built
+
+An **AI Skill Gap Analyzer** that:
+- Takes a resume and job role as input
+- Returns structured JSON with match analysis
+- Parses JSON into a Python dictionary for display
+
+### Key Concepts
+
+#### 1. Why Structured Output?
+
+Plain text → hard for code to process.
+JSON output → easy for code to parse and use.
+
+```
+LLM returns: "The candidate has 3 years of experience in Python..."  ← Hard to parse
+LLM returns: {"experience_years": 3, "skills": ["Python"]}          ← Easy to parse
+```
+
+**In Agentic AI**, agents need structured data (not paragraphs) to make decisions.
+
+#### 2. JSON Schema in Prompts
+
+Tell the AI exactly what shape the JSON should be:
+
+```python
+prompt = f"""
+Extract candidate information.
+
+Return ONLY valid JSON.
+Do not use markdown.
+
+Schema:
+{{
+    "name": "",
+    "email": "",
+    "skills": [],
+    "experience_years": 0,
+    "matching_skills": [],
+    "missing_skills": [],
+    "match_percentage": 0,
+    "recommendation": ""
+}}
+
+Candidate Profile:
+{resume}
+
+Job Role:
+{job_role}
+"""
+```
+
+**Note:** Use `{{` and `}}` inside f-strings to get literal `{` and `}` in the output.
+
+#### 3. Parsing JSON from AI Responses
+
+AI sometimes wraps JSON in markdown code blocks. Clean it first, then parse:
+
+```python
+import json
+
+# Clean the response
+clean_text = response.text.replace("```json", "").replace("```", "").strip()
+
+# Parse JSON → Python dict
+try:
+    data = json.loads(clean_text)
+    print(data["name"])
+    print(data["skills"])
+except json.JSONDecodeError:
+    print("AI returned invalid JSON")
+```
+
+#### 4. The Full AI Workflow
+
+```
+User Input (resume + job role)
+        ↓
+Prompt + JSON Schema
+        ↓
+Google Gemini API
+        ↓
+Structured JSON Response
+        ↓
+json.loads() → Python Dictionary
+        ↓
+Display Clean Report
+```
+
+#### 5. Detailed System Instruction
+
+For complex tasks, give the AI step-by-step instructions:
+
+```python
+system_instruction = """
+You are an expert AI HR Specialist.
+
+Your task:
+1. Extract candidate profile details from the resume.
+2. Compare skills against the target Job Role.
+3. Identify matching_skills.
+4. Identify missing_skills.
+5. Calculate match_percentage (0 to 100).
+6. Provide a recommendation.
+"""
+```
+
+---
+
+## Day 6 — Stateful Chatbot with Persistent Memory
+
+### What was built
+
+A **Gemini chatbot with persistent memory** that:
+- Remembers conversations even after restart
+- Stores chat history in a JSON file
+- Supports clear and exit commands
+
+### Key Concepts
+
+#### 1. Stateless vs Stateful
+
+| Type       | Meaning                              | Example               |
+|------------|--------------------------------------|-----------------------|
+| **Stateless** | Forgets everything after each request | A basic API call    |
+| **Stateful**  | Remembers previous interactions      | ChatGPT-like chatbot |
+
+**LLMs are stateless by nature.** Your application must handle memory.
+
+#### 2. Message Objects
+
+Instead of storing plain strings, store structured message objects:
+
+```python
+# ❌ Plain string (Day 3 approach)
+history = ["User: Hi", "AI: Hello!"]
+
+# ✅ Structured objects (Day 6 approach)
+history = [
+    {"role": "user", "text": "Hi"},
+    {"role": "model", "text": "Hello!"}
+]
+```
+
+**Why?** Structured objects are easier to filter, search, and process programmatically.
+
+#### 3. Persistent Memory (Save to File)
+
+Save history to a JSON file so the chatbot remembers across sessions:
+
+```python
+import json
+
+# Save history
+with open("chat_history.json", "w", encoding="utf-8") as file:
+    json.dump(history, file, indent=4)
+
+# Load history on startup
+import os
+
+if os.path.exists("chat_history.json"):
+    with open("chat_history.json", "r", encoding="utf-8") as file:
+        history = json.load(file)
+else:
+    history = []
+```
+
+#### 4. Building Conversation Prompt from History
+
+Convert structured history back into a text prompt for the AI:
+
+```python
+conversation = ""
+for message in history:
+    conversation += f"{message['role']}: {message['text']}\n"
+
+response = client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents=conversation
+)
+```
+
+#### 5. Save After Every Message
+
+Save immediately after each message — not just on exit. If the program crashes, you don't lose data:
+
+```python
+# After user message
+history.append({"role": "user", "text": user_input})
+with open("chat_history.json", "w") as file:
+    json.dump(history, file, indent=4)
+
+# After AI response
+history.append({"role": "model", "text": ai_reply})
+with open("chat_history.json", "w") as file:
+    json.dump(history, file, indent=4)
+```
+
+#### 6. Memory Flow
+
+```
+App Starts
+    ↓
+Load chat_history.json (if exists)
+    ↓
+User sends message → Add to history → Save to file
+    ↓
+Build full conversation from history
+    ↓
+Send to Gemini → Get response
+    ↓
+Add AI response to history → Save to file
+    ↓
+Repeat until "exit"
+```
+
+---
+
+## 🧠 Concepts Progression Summary
+
+| Day | Concept                 | Why It Matters for Agentic AI |
+|-----|-------------------------|-------------------------------|
+| 1   | Python Basics & OOP     | Foundation — everything is built on this |
+| 2   | APIs & JSON             | AI models communicate through APIs returning JSON |
+| 3   | First LLM API call      | Core skill — calling AI models from code |
+| 4   | Prompt Engineering      | Better prompts = better AI output |
+| 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions |
+| 6   | Memory & Persistence    | Real AI assistants remember past conversations |
+
+---
+
+> **Next up:** Day 7 — Tool Calling & Function Calling (Real Agentic AI begins!) 🤖🚀
