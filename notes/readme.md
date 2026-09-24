@@ -15,6 +15,7 @@
 | [Day 4](#day-4--prompt-engineering) | Prompt Engineering |
 | [Day 5](#day-5--structured-outputs-json-from-llms) | Structured Outputs (JSON from LLMs) |
 | [Day 6](#day-6--stateful-chatbot-with-persistent-memory) | Stateful Chatbot with Persistent Memory |
+| [Day 7](#day-7--smart-utility-agent-tool-calling) | Smart Utility Agent (Tool Calling) |
 
 ---
 
@@ -664,6 +665,225 @@ Repeat until "exit"
 
 ---
 
+## Day 7 — Smart Utility Agent (Tool Calling)
+
+### What was built
+
+A **Smart Utility AI Agent** powered by Google Gemini that:
+- Connects an LLM to deterministic Python functions (tools)
+- Decides which tool to call based on natural language input
+- Extracts arguments and outputs structured JSON commands
+- Executes functions for math, BMI, age calculation, unit conversions, and password generation
+
+### Key Concepts
+
+#### 1. What is an AI Agent?
+
+A traditional LLM only **generates text**. An **AI Agent** can **reason, make decisions, select tools, and take actions**.
+
+| Traditional LLM (Chatbot) | AI Agent |
+|----------------------------|----------|
+| Generates text responses only | Decides actions and calls external tools |
+| Guesses math / calculations (prone to hallucination) | Executes exact Python functions for math & logic |
+| Passive responder | Goal-driven problem solver |
+
+**Core Philosophy of Agentic AI:**
+> **LLM reasons, Code executes.**
+> The LLM figures out *what* needs to be done and extracts parameters, while Python code deterministically executes the action.
+
+#### 2. The Agentic Tool Calling Workflow
+
+```
+User Input ("Calculate BMI for 175cm and 70kg")
+        │
+        ▼
+LLM (Gemini) Reasoning
+- Identifies intent: BMI calculation
+- Selects tool: "bmi"
+- Extracts arguments: height_cm=175, weight_kg=70
+        │
+        ▼
+Structured JSON Command
+{"tool": "bmi", "height_cm": 175, "weight_kg": 70}
+        │
+        ▼
+Python Dispatcher
+- Parses JSON
+- Routes to calculate_bmi(175, 70)
+        │
+        ▼
+Tool Execution & Output (BMI: 22.86)
+```
+
+#### 3. Defining Deterministic Tools (`tools.py`)
+
+Tools are modular Python functions designed to perform specific tasks reliably.
+
+```python
+# tools.py
+from datetime import datetime
+import random
+import string
+
+# 1. Calculator Tools
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def multiply(a, b):
+    return a * b
+
+def divide(a, b):
+    if b == 0:
+        return "Cannot divide by zero"
+    return a / b
+
+# 2. BMI Calculator
+def calculate_bmi(height_cm, weight_kg):
+    height_m = height_cm / 100
+    bmi = weight_kg / (height_m ** 2)
+    return round(bmi, 2)
+
+# 3. Age Calculator
+def calculate_age(year, month, day):
+    dob = datetime(year, month, day)
+    today = datetime.today()
+    age = today.year - dob.year
+    if (today.month, today.day) < (dob.month, dob.day):
+        age -= 1
+    return age
+
+# 4. KM to Miles Converter
+def km_to_miles(km):
+    return round(km * 0.621371, 3)
+
+# 5. Password Generator
+def generate_password(length):
+    chars = string.ascii_letters + string.digits + "!@#$%^&*"
+    return "".join(random.choice(chars) for _ in range(length))
+```
+
+#### 4. Prompting the LLM for Tool Selection
+
+Using system instructions to define available tools and provide structured JSON schemas:
+
+```python
+SYSTEM_PROMPT = """
+You are an AI Utility Agent.
+
+Available tools:
+
+1. add(a,b)
+2. subtract(a,b)
+3. multiply(a,b)
+4. divide(a,b)
+5. bmi(height_cm, weight_kg)
+6. age(year, month, day)
+7. km_to_miles(km)
+8. password(length)
+
+Return ONLY valid JSON.
+
+Schemas:
+
+Calculator:
+{
+  "tool":"add",
+  "a":10,
+  "b":20
+}
+
+BMI:
+{
+  "tool":"bmi",
+  "height_cm":175,
+  "weight_kg":70
+}
+
+Age:
+{
+  "tool":"age",
+  "year":2003,
+  "month":5,
+  "day":18
+}
+
+KM:
+{
+  "tool":"km_to_miles",
+  "km":5
+}
+
+Password:
+{
+  "tool":"password",
+  "length":16
+}
+"""
+```
+
+#### 5. Tool Dispatcher & Execution Loop
+
+The agent receives the JSON command from Gemini, parses it, and executes the matched function:
+
+```python
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
+from tools import *
+import os
+import json
+
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# LLM call with system prompt
+response = client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents=user_input,
+    config=types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT
+    )
+)
+
+# Clean and parse JSON
+clean = response.text.replace("```json", "").replace("```", "").strip()
+command = json.loads(clean)
+tool = command["tool"]
+
+# Dispatch & Execute
+if tool == "add":
+    result = add(command["a"], command["b"])
+elif tool == "subtract":
+    result = subtract(command["a"], command["b"])
+elif tool == "multiply":
+    result = multiply(command["a"], command["b"])
+elif tool == "divide":
+    result = divide(command["a"], command["b"])
+elif tool == "bmi":
+    result = calculate_bmi(command["height_cm"], command["weight_kg"])
+elif tool == "age":
+    result = calculate_age(command["year"], command["month"], command["day"])
+elif tool == "km_to_miles":
+    result = km_to_miles(command["km"])
+elif tool == "password":
+    result = generate_password(command["length"])
+else:
+    result = "Unknown tool."
+
+print(f"AI: {result}")
+```
+
+#### 6. Why LLMs Need External Tools
+
+1. **Deterministic Accuracy:** LLMs predict text probabilistically and can make arithmetic errors or hallucinate. Python functions guarantee 100% mathematical precision.
+2. **Real-time & System Access:** LLMs do not know dynamic runtime information (e.g., today's date for age calculation) or generate truly random secure passwords without code execution.
+3. **Action Capability:** Tools transform passive language models into active agents capable of interacting with APIs, databases, files, and external systems.
+
+---
+
 ## 🧠 Concepts Progression Summary
 
 | Day | Concept                 | Why It Matters for Agentic AI |
@@ -674,7 +894,8 @@ Repeat until "exit"
 | 4   | Prompt Engineering      | Better prompts = better AI output |
 | 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions |
 | 6   | Memory & Persistence    | Real AI assistants remember past conversations |
+| 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code) |
 
 ---
 
-> **Next up:** Day 7 — Tool Calling & Function Calling (Real Agentic AI begins!) 🤖🚀
+> **Next up:** Day 8 — Native Function Calling with Gemini 🚀
