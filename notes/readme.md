@@ -16,6 +16,7 @@
 | [Day 5](#day-5--structured-outputs-json-from-llms) | Structured Outputs (JSON from LLMs) |
 | [Day 6](#day-6--stateful-chatbot-with-persistent-memory) | Stateful Chatbot with Persistent Memory |
 | [Day 7](#day-7--smart-utility-agent-tool-calling) | Smart Utility Agent (Tool Calling) |
+| [Day 8](#day-8--native-function-calling-with-gemini) | Native Function Calling with Gemini |
 
 ---
 
@@ -884,6 +885,217 @@ print(f"AI: {result}")
 
 ---
 
+## Day 8 — Native Function Calling with Gemini
+
+### What was built
+
+A **Smart Student Utility Agent** with **Native Function Calling** powered by Google Gemini SDK (`google-genai`) that:
+- Leverages Gemini's native tool calling capability (`tools=[...]`)
+- Eliminates manual JSON parsing, custom schema prompt engineering, and manual `if/elif` routing
+- Uses Python type hints and docstrings as tool specifications for the LLM
+- Automatically executes registered functions and synthesizes natural conversational answers
+- Provides student calculation tools: Basic math (`add`, `subtract`, `multiply`, `divide`, `square`), Academic tools (`calculate_percentage`, `grade_from_percentage`, `calculate_cgpa`, `attendance_required`), and Utilities (`generate_password`)
+
+### Key Concepts
+
+#### 1. Manual Tool Calling (Day 7) vs Native Function Calling (Day 8)
+
+| Feature | Manual Tool Calling (Day 7) | Native Function Calling (Day 8) |
+|---|---|---|
+| **Tool Definition** | Defined in System Prompt as text / JSON schemas | Plain Python functions with type hints & docstrings |
+| **Model Output** | Raw JSON string containing tool name & arguments | SDK handles tool call protocol natively |
+| **Dispatch & Execution** | Manual `json.loads()`, `if/elif` dispatcher, manual execution | Gemini SDK registers Python functions directly via `tools=[...]` |
+| **Final Answer Synthesis** | Requires manual formatting or second prompt turn | Model receives tool return and synthesizes natural response automatically |
+| **Maintenance & Scalability** | High overhead — prompts and Python code must stay in sync | Low overhead — pass Python function references directly |
+
+#### 2. The Native Function Calling Workflow
+
+```
+User Input ("I attended 48 out of 70 classes, how many more to reach 75% attendance?")
+                                │
+                                ▼
+Gemini Model (Inspects registered tools, signatures & docstrings)
+                                │
+                                ▼
+Model determines intent & invokes `attendance_required(current=48, total=70)`
+                                │
+                                ▼
+Python Function Executes (Returns: 18)
+                                │
+                                ▼
+Gemini receives output & synthesizes conversational response
+                                │
+                                ▼
+Final Output: "You need to attend 18 more consecutive classes to reach 75% attendance."
+```
+
+#### 3. Docstrings & Type Annotations as Tool Schemas
+
+In native function calling, Python functions **are** the API contracts. Gemini inspects the function name, type hints (`int`, `float`, `str`), and docstrings (`"""..."""`) to understand when and how to call each tool:
+
+```python
+def attendance_required(current: int, total: int):
+    """
+    Calculate the number of consecutive classes required
+    to reach 75% attendance.
+    """
+    if total == 0:
+        return "Total classes cannot be zero."
+
+    target = 0.75
+
+    if current / total >= target:
+        return 0
+
+    required = math.ceil(
+        (target * total - current) / (1 - target)
+    )
+
+    return required
+```
+
+**Why Type Hints and Docstrings Matter:**
+- **Docstrings:** Tell the LLM **what** the tool does and **when** to choose it.
+- **Type Hints (`a: float, b: float`):** Tell the LLM **what data types** to pass for each argument.
+- **Parameter Names (`current`, `total`):** Help the LLM extract the correct values from user text.
+
+#### 4. Defining Native Tools (`tools.py`)
+
+Tools are written as clean, standalone Python functions:
+
+```python
+import math
+import random
+import string
+
+# 1. Basic Calculator
+def add(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+def subtract(a: float, b: float) -> float:
+    """Subtract two numbers."""
+    return a - b
+
+def multiply(a: float, b: float) -> float:
+    """Multiply two numbers."""
+    return a * b
+
+def divide(a: float, b: float):
+    """Divide two numbers."""
+    if b == 0:
+        return "Cannot divide by zero."
+    return round(a / b, 2)
+
+def square(a: float) -> float:
+    """Return square of a number."""
+    return a * a
+
+# 2. Student Utilities
+def calculate_percentage(marks: float, total_marks: float) -> float:
+    """Calculate percentage from obtained and total marks."""
+    if total_marks == 0:
+        return 0
+    return round((marks / total_marks) * 100, 2)
+
+def grade_from_percentage(percent: float) -> str:
+    """Convert percentage into a letter grade."""
+    if percent < 0 or percent > 100:
+        return "Invalid Percentage"
+    if percent >= 90:
+        return "A+"
+    elif percent >= 80:
+        return "A"
+    elif percent >= 70:
+        return "B"
+    elif percent >= 60:
+        return "C"
+    elif percent >= 50:
+        return "D"
+    elif percent >= 40:
+        return "E"
+    else:
+        return "F"
+
+def calculate_cgpa(total_points: float) -> float:
+    """Convert total grade points into CGPA."""
+    return round(total_points / 10, 2)
+
+def attendance_required(current: int, total: int):
+    """Calculate the number of consecutive classes required to reach 75% attendance."""
+    if total == 0:
+        return "Total classes cannot be zero."
+    target = 0.75
+    if current / total >= target:
+        return 0
+    required = math.ceil((target * total - current) / (1 - target))
+    return required
+
+# 3. Extra Utility
+def generate_password(length: int) -> str:
+    """Generate a secure random password."""
+    chars = string.ascii_letters + string.digits + "!@#$%^&*"
+    return "".join(random.choice(chars) for _ in range(length))
+```
+
+#### 5. Registering Native Tools with Gemini SDK (`native_function_agent.py`)
+
+Register the functions directly in `types.GenerateContentConfig(tools=...)`:
+
+```python
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
+from tools import *
+import os
+
+load_dotenv()
+
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# Register native Python functions as tools
+TOOLS = [
+    add,
+    subtract,
+    multiply,
+    divide,
+    square,
+    calculate_percentage,
+    grade_from_percentage,
+    calculate_cgpa,
+    attendance_required,
+    generate_password
+]
+
+SYSTEM_PROMPT = """
+You are a Smart Student Utility Agent.
+
+Use the available Python tools whenever needed.
+Do not calculate manually if a suitable tool exists.
+"""
+
+# Native Function Calling Execution
+response = client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents="I scored 420 out of 500. What is my percentage and grade?",
+    config=types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        tools=TOOLS
+    )
+)
+
+print(f"AI: {response.text}")
+```
+
+#### 6. Why Native Function Calling is the Production Standard
+
+1. **Zero JSON Parsing Boilerplate:** No string stripping, regex manipulation, or manual `json.loads()` handling.
+2. **Automatic Execution & Result Feeding:** The Gemini SDK handles calling the function and supplying its return value back to the model seamlessly.
+3. **Multi-Step & Multi-Tool Reasoning:** The model can call multiple functions across reasoning steps to fulfill complex user prompts.
+4. **Maintainable & Extensible:** Adding a new tool is as simple as defining a standard Python function and adding it to the `TOOLS` list.
+
+---
+
 ## 🧠 Concepts Progression Summary
 
 | Day | Concept                 | Why It Matters for Agentic AI |
@@ -895,7 +1107,8 @@ print(f"AI: {result}")
 | 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions |
 | 6   | Memory & Persistence    | Real AI assistants remember past conversations |
 | 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code) |
+| 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions |
 
 ---
 
-> **Next up:** Day 8 — Native Function Calling with Gemini 🚀
+> **Next up:** Day 9 — Advanced Agent Workflows & Multi-Tool Orchestration 🚀
