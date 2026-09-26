@@ -17,6 +17,7 @@
 | [Day 6](#day-6--stateful-chatbot-with-persistent-memory) | Stateful Chatbot with Persistent Memory |
 | [Day 7](#day-7--smart-utility-agent-tool-calling) | Smart Utility Agent (Tool Calling) |
 | [Day 8](#day-8--native-function-calling-with-gemini) | Native Function Calling with Gemini |
+| [Day 9](#day-9--long-term-memory-agent-with-multi-tool-support) | Long-Term Memory Agent with Multi-Tool Support |
 
 ---
 
@@ -1096,6 +1097,243 @@ print(f"AI: {response.text}")
 
 ---
 
+## Day 9 — Long-Term Memory Agent with Multi-Tool Support
+
+### What was built
+
+A **Smart Student AI Assistant** that combines everything from Days 6–8 into one unified agent:
+- Persistent conversation memory (chat history)
+- Long-term personal notes memory
+- Native function calling with multiple tools
+- Context-aware responses that reference saved notes
+
+### Key Concepts
+
+#### 1. The Unified Agent Architecture
+
+Day 9 brings together three pillars: **Memory + Notes + Tools** into a single stateful agent.
+
+```
+┌─────────────────────────────────────────────┐
+│           Smart Student AI Agent            │
+├─────────────┬──────────────┬────────────────┤
+│  💬 Chat    │  📝 Notes    │  🔧 Tools      │
+│  Memory     │  Memory      │  (Functions)   │
+│             │              │                │
+│ chat_history│  notes.json  │  add, subtract │
+│   .json     │              │  multiply, etc │
+└─────────────┴──────────────┴────────────────┘
+```
+
+| Component          | Purpose                                   | Storage           |
+|--------------------|-------------------------------------------|-------------------|
+| **Chat Memory**    | Remember previous conversation turns      | `chat_history.json` |
+| **Notes Memory**   | Store long-term personal facts & reminders| `notes.json`        |
+| **Native Tools**   | Execute deterministic calculations        | Python functions    |
+
+#### 2. Two Types of Memory
+
+**Short-term memory** (Chat History) — the conversation so far:
+```python
+history = [
+    {"role": "user", "text": "Add 25 and 30"},
+    {"role": "model", "text": "The sum of 25 and 30 is 55."}
+]
+```
+
+**Long-term memory** (Notes) — facts that persist across conversations:
+```python
+notes = ["My favorite language is Python"]
+```
+
+The agent injects notes into the prompt context, so when the user asks "What's my favorite language?" — the AI knows the answer even if it was saved in a previous session.
+
+#### 3. Safe JSON Loader Pattern
+
+A reusable function to safely load JSON files that handles missing files, empty files, and corrupt data:
+
+```python
+import json
+import os
+
+def load_json(filename):
+    try:
+        if os.path.exists(filename):
+            with open(filename, "r", encoding="utf-8") as file:
+                content = file.read().strip()
+
+                if content:
+                    return json.loads(content)
+
+        return []
+
+    except json.JSONDecodeError:
+        return []
+
+
+def save_json(filename, data):
+    with open(filename, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+```
+
+**Why?** In production, files may be empty, missing, or corrupted. This pattern ensures the agent never crashes on startup.
+
+#### 4. Command Handling Before AI
+
+The agent handles special commands (notes operations, clear, exit) **before** sending anything to the LLM — saving API calls and latency.
+
+```python
+while True:
+    user = input("\nYou: ").strip()
+
+    # ---------- EXIT ----------
+    if user.lower() == "exit":
+        print("\n💾 Data saved successfully!")
+        break
+
+    # ---------- CLEAR CHAT ----------
+    if user.lower() == "clear":
+        history.clear()
+        save_json("chat_history.json", history)
+        print("🧹 Conversation history cleared!")
+        continue
+
+    # ---------- SAVE NOTE ----------
+    if user.lower().startswith("save note"):
+        note = user[9:].strip()
+
+        if note:
+            notes.append(note)
+            save_json("notes.json", notes)
+            print("📝 Note saved!")
+        else:
+            print("Please enter a note.")
+
+        continue
+
+    # ---------- SHOW NOTES ----------
+    if user.lower() == "show notes":
+        if not notes:
+            print("📭 No notes available.")
+        else:
+            print("\n📒 Your Notes")
+            print("-" * 30)
+            for i, note in enumerate(notes, start=1):
+                print(f"{i}. {note}")
+
+        continue
+
+    # ---------- DELETE NOTES ----------
+    if user.lower() == "delete notes":
+        notes.clear()
+        save_json("notes.json", notes)
+        print("🗑 All notes deleted!")
+        continue
+
+    # ... only non-command input reaches the LLM
+```
+
+**Design principle:** Handle deterministic actions locally; only use the LLM for tasks that need reasoning.
+
+#### 5. Building Context with Notes + History
+
+The key innovation is injecting **both** notes and chat history into the prompt, so the AI has full context:
+
+```python
+# Build conversation prompt with context
+conversation = ""
+
+# Inject long-term memory (notes)
+if notes:
+    conversation += "User Notes:\n"
+
+    for note in notes:
+        conversation += f"- {note}\n"
+
+    conversation += "\n"
+
+# Append chat history
+for msg in history:
+    conversation += f"{msg['role']}: {msg['text']}\n"
+
+# Send to Gemini with native tools
+response = client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents=conversation,
+    config=types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        tools=TOOLS
+    )
+)
+```
+
+**What the AI actually sees:**
+```
+User Notes:
+- My favorite language is Python
+
+user: Add 25 and 30
+model: The sum of 25 and 30 is 55.
+user: What's my favorite language?
+```
+
+This lets the AI answer personal questions using saved notes — true long-term memory.
+
+#### 6. Saving After Every Interaction
+
+Both the user message and AI response are saved immediately — not on exit:
+
+```python
+# Save user message immediately
+history.append({"role": "user", "text": user})
+save_json("chat_history.json", history)
+
+# ... get AI response ...
+
+# Save AI response immediately
+history.append({"role": "model", "text": ai})
+save_json("chat_history.json", history)
+```
+
+**Why?** If the program crashes mid-conversation, you don't lose everything. This is the same pattern from Day 6, now applied in a multi-tool context.
+
+#### 7. The Complete Agent Flow
+
+```
+App Starts
+    ↓
+Load chat_history.json + notes.json
+    ↓
+User Input
+    ↓
+┌─ Is it a command? (save note / show notes / delete notes / clear / exit)
+│   YES → Handle locally, save, continue
+│   NO  ↓
+├─ Save user message to history
+│   ↓
+├─ Build context: Notes + Chat History
+│   ↓
+├─ Send to Gemini (with native tools registered)
+│   ↓
+├─ Gemini reasons → may call tools → synthesizes response
+│   ↓
+├─ Save AI response to history
+│   ↓
+└─ Display response → Loop back
+```
+
+#### 8. Why Long-Term Memory Matters for Agentic AI
+
+| Without Notes Memory | With Notes Memory |
+|---------------------|-------------------|
+| AI forgets preferences after clearing chat | "My favorite language is Python" persists forever |
+| User must repeat context | Agent reads notes and knows user's background |
+| Feels like a new stranger each time | Feels like a personal assistant that knows you |
+
+Real-world AI assistants (Siri, Google Assistant, Alexa) maintain user profiles and preferences — this is the same concept, implemented from scratch.
+
+---
+
 ## 🧠 Concepts Progression Summary
 
 | Day | Concept                 | Why It Matters for Agentic AI |
@@ -1108,7 +1346,8 @@ print(f"AI: {response.text}")
 | 6   | Memory & Persistence    | Real AI assistants remember past conversations |
 | 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code) |
 | 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions |
+| 9   | Long-Term Memory Agent  | Unified agent with notes memory + chat memory + native tools — a true personal assistant |
 
 ---
 
-> **Next up:** Day 9 — Advanced Agent Workflows & Multi-Tool Orchestration 🚀
+> **Next up:** Day 10 — RAG (Chat with PDFs & Documents) 🚀
