@@ -1,0 +1,86 @@
+[
+    {
+        "role": "user",
+        "text": "Add 25 and 30"
+    },
+    {
+        "role": "user",
+        "text": "Add 25 and 30"
+    },
+    {
+        "role": "model",
+        "text": "The sum of 25 and 30 is 55."
+    },
+    {
+        "role": "user",
+        "text": "Calculate percentage of 420 out of 500"
+    },
+    {
+        "role": "model",
+        "text": "The percentage is 84%."
+    },
+    {
+        "role": "user",
+        "text": "Convert 84 into grade"
+    },
+    {
+        "role": "model",
+        "text": "The grade for 84% is A."
+    },
+    {
+        "role": "user",
+        "text": "My CGPA points are 88"
+    },
+    {
+        "role": "model",
+        "text": "Your CGPA is 8.8 based on the total grade points of 88."
+    },
+    {
+        "role": "user",
+        "text": "I attended 48 out of 70 classes. How many more classes for 75%?"
+    },
+    {
+        "role": "model",
+        "text": "You need to attend 18 more consecutive classes to reach 75% attendance."
+    },
+    {
+        "role": "user",
+        "text": "Generate a 16 character password"
+    },
+    {
+        "role": "model",
+        "text": "Your 16-character secure password is: `8JdFApH3$LA0QW!N`"
+    },
+    {
+        "role": "user",
+        "text": "What's my favorite language?"
+    },
+    {
+        "role": "model",
+        "text": "Your favorite language is Python!"
+    },
+    {
+        "role": "user",
+        "text": "bye"
+    },
+    {
+        "role": "model",
+        "text": "Goodbye! Have a great day, and feel free to reach out if you need any more help."
+    },
+    {
+        "role": "user",
+        "text": "who are u"
+    },
+    {
+        "role": "model",
+        "text": "I am your Smart Student AI Assistant, here to help you with your studies, calculations, and student-related tasks!"
+    },
+    {
+        "role": "user",
+        "text": "what functions can u do can u list it"
+    },
+    {
+        "role": "model",
+        "text": "Here are the functions I can perform to help you:\n\n- **Basic Arithmetic:** Add, subtract, multiply, and divide numbers.\n- **Advanced Math:** Find the square of a number.\n- **Academic Calculations:** \n  - Calculate percentages from obtained and total marks.\n  - Convert percentages into letter grades.\n  - Calculate CGPA from total grade points.\n  - Calculate consecutive classes required to reach 75% attendance.\n- **Utility:** Generate secure random passwords.\n- **Personalized Help:** Remember your preferences (like your favorite programming language) and assist with student-related questions."
+    }
+]
