@@ -1,0 +1,7 @@
+Agentic AI is an AI system that can reason, use tools, and remember information.
+
+RAG stands for Retrieval Augmented Generation.
+
+Python is commonly used for building AI agents.
+
+Vector search finds the most relevant text instead of searching exact keywords.
