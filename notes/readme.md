@@ -18,6 +18,7 @@
 | [Day 7](#day-7--smart-utility-agent-tool-calling) | Smart Utility Agent (Tool Calling) |
 | [Day 8](#day-8--native-function-calling-with-gemini) | Native Function Calling with Gemini |
 | [Day 9](#day-9--long-term-memory-agent-with-multi-tool-support) | Long-Term Memory Agent with Multi-Tool Support |
+| [Day 10](#day-10--retrieval-augmented-generation-rag-with-text--pdf) | Retrieval-Augmented Generation (RAG) with Text & PDF |
 
 ---
 
@@ -1334,6 +1335,336 @@ Real-world AI assistants (Siri, Google Assistant, Alexa) maintain user profiles 
 
 ---
 
+## Day 10 — Retrieval-Augmented Generation (RAG) with Text & PDF
+
+### What was built
+
+A **Knowledge Retrieval & Document QA System (RAG)** featuring two implementations:
+1. **Text RAG Chatbot (`rag_chatbot_txt.py`)**: Answers questions from a local plain-text knowledge base (`notes.txt`) by dynamically extracting, vectorizing, and ranking text paragraphs.
+2. **PDF RAG Chatbot (`rag_chatbot_pdf.py`)**: Reads full PDF documents (`document.pdf`), extracts text page-by-page using `pypdf`, splits them into uniform 500-character chunks, indexes them with TF-IDF vectors, performs Cosine Similarity search to find the most relevant chunk, and injects that context into Gemini for strictly grounded answers.
+
+### Key Concepts
+
+#### 1. What is RAG (Retrieval-Augmented Generation)?
+
+RAG is an AI architectural pattern that combines **information retrieval** (searching an external knowledge base) with **LLM generation** (generating natural language answers).
+
+| ❌ Limitations of Pure LLMs | ✅ How RAG Solves It |
+|---|---|
+| • Knowledge cutoff date | • Dynamic access to live, updated data |
+| • Hallucinates missing facts | • Grounded in real source text |
+| • No access to private documents | • Connects your private files & databases |
+| • Expensive to fine-tune on new data | • Zero model retraining needed |
+| • Context window & token limits | • Retrieves and sends only relevant snippets |
+
+#### 2. The Complete RAG Architecture & Pipeline
+
+A standard RAG pipeline consists of two distinct workflows: **Ingestion / Indexing** and **Query & Generation**.
+
+```
+[ INGESTION / INDEXING PHASE ]
+  Raw Document (.txt / .pdf)
+            │
+            ▼
+    Text Extraction (pypdf / open)
+            │
+            ▼
+       Chunking (Paragraphs / 500 chars)
+            │
+            ▼
+   Vectorization (TF-IDF / Embeddings)
+            │
+            ▼
+     Vector Database / Matrix
+
+──────────────────────────────────────────────────────────────
+
+[ QUERY & GENERATION PHASE ]
+  User Question ("What is machine learning?")
+            │
+            ▼
+   Vectorize Question (TF-IDF transform)
+            │
+            ▼
+   Cosine Similarity Search (Question Vector vs Chunk Vectors)
+            │
+            ▼
+   Select Best Context Chunk (argmax score)
+            │
+            ▼
+   Prompt Augmentation (Context + Question + Grounding Rules)
+            │
+            ▼
+   Gemini API (Inference & Reasoning)
+            │
+            ▼
+   Grounded Answer ("According to the document...")
+```
+
+#### 3. Step 1: Document Loading & Text Extraction
+
+Before text can be searched, it must be extracted into plain text.
+
+**A. Plain Text Files (`open`):**
+```python
+with open("notes.txt", "r", encoding="utf-8") as file:
+    text = file.read()
+```
+
+**B. PDF Files with `pypdf` (`PdfReader`):**
+PDFs contain binary streams, layout information, and fonts. `pypdf` parses individual pages and extracts plain text.
+
+```python
+from pypdf import PdfReader
+
+reader = PdfReader("document.pdf")
+text = ""
+
+for page in reader.pages:
+    extracted = page.extract_text()
+    if extracted:
+        text += extracted + "\n"
+```
+
+#### 4. Step 2: Text Chunking Strategies
+
+LLMs have token limits, and sending an entire 100-page document for a simple question is inefficient, slow, and expensive. **Chunking** breaks large documents into smaller, searchable pieces.
+
+| Chunking Strategy | Implementation | Best For |
+|---|---|---|
+| **Paragraph Splitting** | `text.split("\n\n")` | Structured text with clear topic boundaries |
+| **Fixed-Character Windows** | `range(0, len(text), chunk_size)` | Long continuous documents, PDF extractions |
+| **Sliding Window with Overlap** | `chunk_size` with `overlap` | Preserving context across chunk boundaries |
+
+**Fixed-Window Chunking Example (Day 10):**
+```python
+chunks = []
+chunk_size = 500
+
+for i in range(0, len(text), chunk_size):
+    chunk = text[i:i + chunk_size]
+    if chunk.strip():
+        chunks.append(chunk)
+```
+
+#### 5. Step 3: TF-IDF Vectorization
+
+Computers cannot compare raw strings mathematically. We convert text chunks into numeric vectors using **TF-IDF** (*Term Frequency - Inverse Document Frequency*).
+
+- **TF (Term Frequency):** Measures how frequently a word appears inside a specific chunk.
+- **IDF (Inverse Document Frequency):** Measures how rare or unique a word is across all chunks. Common words like "the", "is" get low weights; unique domain keywords get high weights.
+- **TF-IDF Score:** `TF × IDF` — gives high numerical weight to distinct, informative words.
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizer = TfidfVectorizer()
+
+# fit_transform learns vocabulary and encodes all document chunks into vectors
+vectors = vectorizer.fit_transform(chunks)
+
+# transform uses existing vocabulary to convert user query into the same vector space
+query_vector = vectorizer.transform([user_question])
+```
+
+#### 6. Step 4: Similarity Search with Cosine Similarity
+
+**Cosine Similarity** measures the cosine of the angle between two multi-dimensional vectors. It determines whether two texts share the same subject regardless of document length.
+
+$$\text{Cosine Similarity}(A, B) = \frac{A \cdot B}{\|A\| \|B\|}$$
+
+- **Score = 1.0:** Vectors point in the exact same direction (highest similarity).
+- **Score = 0.0:** Vectors are orthogonal / share no common terms.
+
+```python
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Compare query vector against all document chunk vectors
+scores = cosine_similarity(query_vector, vectors)
+
+# Find index of chunk with the highest similarity score
+best_index = scores.argmax()
+best_chunk = chunks[best_index]
+```
+
+#### 7. Step 5: Context Injection & Prompt Grounding
+
+Once the best chunk is retrieved, it is injected into the prompt as the sole source of truth. We provide strict instructions to prevent the model from using outside assumptions or hallucinating.
+
+```python
+prompt = f"""
+You are a PDF assistant.
+
+Answer ONLY using the provided context.
+If the answer is not present, say:
+"I couldn't find that information in the PDF."
+
+Context:
+{best_chunk}
+
+Question:
+{question}
+"""
+
+response = client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents=prompt
+)
+```
+
+**Why Grounding Rules Matter:**
+- **Zero Hallucination:** Prevents the LLM from making up plausible-sounding answers when the information isn't in your document.
+- **Verifiable Answers:** Users can trust that every answer directly references their actual data.
+
+#### 8. Complete Code Implementations
+
+##### A. Plain Text RAG Chatbot (`rag_chatbot_txt.py`)
+
+```python
+from google import genai
+from dotenv import load_dotenv
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import os
+
+# 1. Load Environment & Gemini Client
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# 2. Load and Chunk Knowledge Base
+with open("notes.txt", "r", encoding="utf-8") as file:
+    text = file.read()
+
+chunks = [chunk.strip() for chunk in text.split("\n\n") if chunk.strip()]
+
+# 3. Create Vector Database
+vectorizer = TfidfVectorizer()
+vectors = vectorizer.fit_transform(chunks)
+
+print("=" * 45)
+print("📚 RAG Chatbot")
+print("=" * 45)
+print("Ask questions from notes.txt (type 'exit' to quit)\n")
+
+# 4. Retrieval & Query Loop
+while True:
+    user = input("You: ").strip()
+    if user.lower() == "exit":
+        break
+
+    # Vectorize query & compute similarity
+    query_vector = vectorizer.transform([user])
+    scores = cosine_similarity(query_vector, vectors)
+    best_index = scores.argmax()
+    context = chunks[best_index]
+
+    # Build grounded prompt
+    prompt = f"""
+Answer the user's question using ONLY the provided context.
+
+Context:
+{context}
+
+Question:
+{user}
+"""
+
+    response = client.models.generate_content(
+        model="gemini-3.5-flash-lite",
+        contents=prompt
+    )
+
+    print(f"\nAI: {response.text}\n" + "-" * 40)
+```
+
+##### B. PDF RAG Chatbot (`rag_chatbot_pdf.py`)
+
+```python
+from google import genai
+from dotenv import load_dotenv
+from pypdf import PdfReader
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import os
+
+# 1. Load Environment
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# 2. Extract Text from PDF
+reader = PdfReader("document.pdf")
+text = ""
+for page in reader.pages:
+    extracted = page.extract_text()
+    if extracted:
+        text += extracted + "\n"
+
+# 3. Text Chunking (Fixed-Window of 500 characters)
+chunks = []
+chunk_size = 500
+for i in range(0, len(text), chunk_size):
+    chunk = text[i:i + chunk_size]
+    if chunk.strip():
+        chunks.append(chunk)
+
+# 4. Build TF-IDF Vector Index
+vectorizer = TfidfVectorizer()
+vectors = vectorizer.fit_transform(chunks)
+
+print("=" * 50)
+print("📚 PDF RAG Chatbot")
+print("=" * 50)
+print(f"Loaded {len(chunks)} text chunks. Type 'exit' to quit.\n")
+
+# 5. Interactive Question-Answering Loop
+while True:
+    question = input("\nYou: ").strip()
+    if question.lower() == "exit":
+        print("👋 Goodbye!")
+        break
+
+    # Similarity Search
+    query_vector = vectorizer.transform([question])
+    scores = cosine_similarity(query_vector, vectors)
+    best_index = scores.argmax()
+    best_chunk = chunks[best_index]
+
+    # Augmented Prompt with Grounding Guardrails
+    prompt = f"""
+You are a PDF assistant.
+
+Answer ONLY using the provided context.
+If the answer is not present, say:
+"I couldn't find that information in the PDF."
+
+Context:
+{best_chunk}
+
+Question:
+{question}
+"""
+
+    response = client.models.generate_content(
+        model="gemini-3.5-flash-lite",
+        contents=prompt
+    )
+
+    print(f"\nAI: {response.text}")
+    print("-" * 50)
+```
+
+#### 9. Why RAG is Essential for Agentic AI
+
+| Capability | Pure LLM | RAG-Powered Agent |
+|---|---|---|
+| **Private Enterprise Data** | Cannot access proprietary PDFs/DBs | Searches private company documents securely |
+| **Data Freshness** | Outdated by knowledge cutoff | Always queries latest saved documents |
+| **Hallucination Control** | High risk on niche facts | Zero/minimal — answers tied to retrieved context |
+| **Token Efficiency & Cost** | Requires passing massive files | Passes only the exact ~500 character snippet needed |
+| **Explainability & Source Auditing** | Black box generation | Exact source chunk and page can be cited |
+
+---
+
 ## 🧠 Concepts Progression Summary
 
 | Day | Concept                 | Why It Matters for Agentic AI |
@@ -1347,7 +1678,9 @@ Real-world AI assistants (Siri, Google Assistant, Alexa) maintain user profiles 
 | 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code) |
 | 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions |
 | 9   | Long-Term Memory Agent  | Unified agent with notes memory + chat memory + native tools — a true personal assistant |
+| 10  | RAG (Text & PDF Search) | Grounding LLMs with external knowledge via chunking, TF-IDF vectorization & cosine similarity |
 
 ---
 
-> **Next up:** Day 10 — RAG (Chat with PDFs & Documents) 🚀
+> **Next up:** Day 11 — Advanced Vector Databases & Semantic Embeddings 🚀
+
