@@ -7,17 +7,17 @@
 
 ## 📅 Table of Contents
 
-| Day | Topic |
-|-----|-------|
-| [Day 1](#day-1--python-basics--oop) | Python Basics & OOP |
-| [Day 2](#day-2--apis-json--exception-handling) | APIs, JSON & Exception Handling |
-| [Day 3](#day-3--first-ai-chatbot-gemini-api) | First AI Chatbot (Gemini API) |
-| [Day 4](#day-4--prompt-engineering) | Prompt Engineering |
-| [Day 5](#day-5--structured-outputs-json-from-llms) | Structured Outputs (JSON from LLMs) |
-| [Day 6](#day-6--stateful-chatbot-with-persistent-memory) | Stateful Chatbot with Persistent Memory |
-| [Day 7](#day-7--smart-utility-agent-tool-calling) | Smart Utility Agent (Tool Calling) |
-| [Day 8](#day-8--native-function-calling-with-gemini) | Native Function Calling with Gemini |
-| [Day 9](#day-9--long-term-memory-agent-with-multi-tool-support) | Long-Term Memory Agent with Multi-Tool Support |
+| Day                                                                  | Topic                                                |
+| -------------------------------------------------------------------- | ---------------------------------------------------- |
+| [Day 1](#day-1--python-basics--oop)                                  | Python Basics & OOP                                  |
+| [Day 2](#day-2--apis-json--exception-handling)                       | APIs, JSON & Exception Handling                      |
+| [Day 3](#day-3--first-ai-chatbot-gemini-api)                         | First AI Chatbot (Gemini API)                        |
+| [Day 4](#day-4--prompt-engineering)                                  | Prompt Engineering                                   |
+| [Day 5](#day-5--structured-outputs-json-from-llms)                   | Structured Outputs (JSON from LLMs)                  |
+| [Day 6](#day-6--stateful-chatbot-with-persistent-memory)             | Stateful Chatbot with Persistent Memory              |
+| [Day 7](#day-7--smart-utility-agent-tool-calling)                    | Smart Utility Agent (Tool Calling)                   |
+| [Day 8](#day-8--native-function-calling-with-gemini)                 | Native Function Calling with Gemini                  |
+| [Day 9](#day-9--long-term-memory-agent-with-multi-tool-support)      | Long-Term Memory Agent with Multi-Tool Support       |
 | [Day 10](#day-10--retrieval-augmented-generation-rag-with-text--pdf) | Retrieval-Augmented Generation (RAG) with Text & PDF |
 
 ---
@@ -52,14 +52,14 @@ print(name)  # Output: Mayur
 
 #### 3. Data Types
 
-| Type   | Example              | Description           |
-|--------|----------------------|-----------------------|
-| `str`  | `"Hello"`            | Text                  |
-| `int`  | `22`                 | Whole number          |
-| `float`| `3.14`               | Decimal number        |
-| `list` | `["Python", "Java"]` | Ordered collection    |
-| `dict` | `{"name": "Mayur"}`  | Key-value pairs       |
-| `bool` | `True` / `False`     | True or False         |
+| Type    | Example              | Description        |
+| ------- | -------------------- | ------------------ |
+| `str`   | `"Hello"`            | Text               |
+| `int`   | `22`                 | Whole number       |
+| `float` | `3.14`               | Decimal number     |
+| `list`  | `["Python", "Java"]` | Ordered collection |
+| `dict`  | `{"name": "Mayur"}`  | Key-value pairs    |
+| `bool`  | `True` / `False`     | True or False      |
 
 #### 4. Lists
 
@@ -74,6 +74,7 @@ for i, lang in enumerate(languages, start=1):
 ```
 
 **Output:**
+
 ```
 1. Python
 2. JavaScript
@@ -126,18 +127,19 @@ student.greet()
 ```
 
 **Output:**
+
 ```
 Hello, my name is Mayur and I am 22 years old.
 ```
 
 **Key OOP Terms:**
-| Term          | Meaning                                                 |
+| Term | Meaning |
 |---------------|----------------------------------------------------------|
-| `class`       | A blueprint/template for objects                         |
-| `object`      | An instance created from a class                         |
-| `__init__`    | Constructor — runs automatically when an object is created |
-| `self`        | Refers to the current object itself                      |
-| `method`      | A function defined inside a class                        |
+| `class` | A blueprint/template for objects |
+| `object` | An instance created from a class |
+| `__init__` | Constructor — runs automatically when an object is created |
+| `self` | Refers to the current object itself |
+| `method` | A function defined inside a class |
 
 #### 8. f-Strings
 
@@ -213,10 +215,10 @@ print(type(data))          # <class 'dict'>
 ```
 
 **Remember:**
-| Function      | Direction                     | Think of it as        |
+| Function | Direction | Think of it as |
 |---------------|-------------------------------|-----------------------|
-| `json.dumps()`| Python → JSON string          | **d**ump to **s**tring|
-| `json.loads()`| JSON string → Python          | **l**oad from **s**tring|
+| `json.dumps()`| Python → JSON string | **d**ump to **s**tring|
+| `json.loads()`| JSON string → Python | **l**oad from **s**tring|
 
 #### 4. REST API
 
@@ -240,11 +242,11 @@ else:
 ```
 
 **Common HTTP Status Codes:**
-| Code | Meaning          |
+| Code | Meaning |
 |------|------------------|
-| 200  | ✅ OK (Success)  |
-| 404  | ❌ Not Found     |
-| 500  | 💥 Server Error  |
+| 200 | ✅ OK (Success) |
+| 404 | ❌ Not Found |
+| 500 | 💥 Server Error |
 
 #### 5. Environment Variables
 
@@ -274,6 +276,7 @@ print(api_key)  # your_secret_key_here
 ### What was built
 
 A **terminal chatbot** using Google Gemini API that:
+
 - Chats in a loop
 - Maintains conversation history in memory
 - Saves the full conversation to a text file on exit
@@ -338,6 +341,7 @@ while True:
 ```
 
 **How it works:**
+
 ```
 Turn 1: "Hi"                         → AI: "Hello!"
 Turn 2: "Hi\nAI: Hello!\nUser: What is Python?" → AI: "Python is..."
@@ -376,16 +380,16 @@ Prompt Engineering is the skill of writing clear, structured instructions to get
 Role + Task + Context + Constraints = Good Prompt
 ```
 
-| Part        | Example                                       |
-|-------------|-----------------------------------------------|
-| **Role**    | "You are a Python mentor."                    |
-| **Task**    | "Explain dictionaries."                       |
-| **Context** | "I'm a third-year engineering student."       |
+| Part            | Example                                         |
+| --------------- | ----------------------------------------------- |
+| **Role**        | "You are a Python mentor."                      |
+| **Task**        | "Explain dictionaries."                         |
+| **Context**     | "I'm a third-year engineering student."         |
 | **Constraints** | "Use simple English and one real-life example." |
 
 #### 3. System Instruction
 
-A **system instruction** tells the AI *who it should act as* before the conversation starts. It sets the AI's personality and behavior.
+A **system instruction** tells the AI _who it should act as_ before the conversation starts. It sets the AI's personality and behavior.
 
 ```python
 from google.genai import types
@@ -453,6 +457,7 @@ This makes AI output consistent and predictable every time.
 ### What was built
 
 An **AI Skill Gap Analyzer** that:
+
 - Takes a resume and job role as input
 - Returns structured JSON with match analysis
 - Parses JSON into a Python dictionary for display
@@ -508,7 +513,7 @@ Job Role:
 
 AI sometimes wraps JSON in markdown code blocks. Clean it first, then parse:
 
-```python
+````python
 import json
 
 # Clean the response
@@ -521,7 +526,7 @@ try:
     print(data["skills"])
 except json.JSONDecodeError:
     print("AI returned invalid JSON")
-```
+````
 
 #### 4. The Full AI Workflow
 
@@ -564,6 +569,7 @@ Your task:
 ### What was built
 
 A **Gemini chatbot with persistent memory** that:
+
 - Remembers conversations even after restart
 - Stores chat history in a JSON file
 - Supports clear and exit commands
@@ -572,10 +578,10 @@ A **Gemini chatbot with persistent memory** that:
 
 #### 1. Stateless vs Stateful
 
-| Type       | Meaning                              | Example               |
-|------------|--------------------------------------|-----------------------|
-| **Stateless** | Forgets everything after each request | A basic API call    |
-| **Stateful**  | Remembers previous interactions      | ChatGPT-like chatbot |
+| Type          | Meaning                               | Example              |
+| ------------- | ------------------------------------- | -------------------- |
+| **Stateless** | Forgets everything after each request | A basic API call     |
+| **Stateful**  | Remembers previous interactions       | ChatGPT-like chatbot |
 
 **LLMs are stateless by nature.** Your application must handle memory.
 
@@ -673,6 +679,7 @@ Repeat until "exit"
 ### What was built
 
 A **Smart Utility AI Agent** powered by Google Gemini that:
+
 - Connects an LLM to deterministic Python functions (tools)
 - Decides which tool to call based on natural language input
 - Extracts arguments and outputs structured JSON commands
@@ -684,15 +691,16 @@ A **Smart Utility AI Agent** powered by Google Gemini that:
 
 A traditional LLM only **generates text**. An **AI Agent** can **reason, make decisions, select tools, and take actions**.
 
-| Traditional LLM (Chatbot) | AI Agent |
-|----------------------------|----------|
-| Generates text responses only | Decides actions and calls external tools |
+| Traditional LLM (Chatbot)                            | AI Agent                                         |
+| ---------------------------------------------------- | ------------------------------------------------ |
+| Generates text responses only                        | Decides actions and calls external tools         |
 | Guesses math / calculations (prone to hallucination) | Executes exact Python functions for math & logic |
-| Passive responder | Goal-driven problem solver |
+| Passive responder                                    | Goal-driven problem solver                       |
 
 **Core Philosophy of Agentic AI:**
+
 > **LLM reasons, Code executes.**
-> The LLM figures out *what* needs to be done and extracts parameters, while Python code deterministically executes the action.
+> The LLM figures out _what_ needs to be done and extracts parameters, while Python code deterministically executes the action.
 
 #### 2. The Agentic Tool Calling Workflow
 
@@ -831,7 +839,7 @@ Password:
 
 The agent receives the JSON command from Gemini, parses it, and executes the matched function:
 
-```python
+````python
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -877,7 +885,7 @@ else:
     result = "Unknown tool."
 
 print(f"AI: {result}")
-```
+````
 
 #### 6. Why LLMs Need External Tools
 
@@ -892,6 +900,7 @@ print(f"AI: {result}")
 ### What was built
 
 A **Smart Student Utility Agent** with **Native Function Calling** powered by Google Gemini SDK (`google-genai`) that:
+
 - Leverages Gemini's native tool calling capability (`tools=[...]`)
 - Eliminates manual JSON parsing, custom schema prompt engineering, and manual `if/elif` routing
 - Uses Python type hints and docstrings as tool specifications for the LLM
@@ -902,13 +911,13 @@ A **Smart Student Utility Agent** with **Native Function Calling** powered by Go
 
 #### 1. Manual Tool Calling (Day 7) vs Native Function Calling (Day 8)
 
-| Feature | Manual Tool Calling (Day 7) | Native Function Calling (Day 8) |
-|---|---|---|
-| **Tool Definition** | Defined in System Prompt as text / JSON schemas | Plain Python functions with type hints & docstrings |
-| **Model Output** | Raw JSON string containing tool name & arguments | SDK handles tool call protocol natively |
-| **Dispatch & Execution** | Manual `json.loads()`, `if/elif` dispatcher, manual execution | Gemini SDK registers Python functions directly via `tools=[...]` |
-| **Final Answer Synthesis** | Requires manual formatting or second prompt turn | Model receives tool return and synthesizes natural response automatically |
-| **Maintenance & Scalability** | High overhead — prompts and Python code must stay in sync | Low overhead — pass Python function references directly |
+| Feature                       | Manual Tool Calling (Day 7)                                   | Native Function Calling (Day 8)                                           |
+| ----------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Tool Definition**           | Defined in System Prompt as text / JSON schemas               | Plain Python functions with type hints & docstrings                       |
+| **Model Output**              | Raw JSON string containing tool name & arguments              | SDK handles tool call protocol natively                                   |
+| **Dispatch & Execution**      | Manual `json.loads()`, `if/elif` dispatcher, manual execution | Gemini SDK registers Python functions directly via `tools=[...]`          |
+| **Final Answer Synthesis**    | Requires manual formatting or second prompt turn              | Model receives tool return and synthesizes natural response automatically |
+| **Maintenance & Scalability** | High overhead — prompts and Python code must stay in sync     | Low overhead — pass Python function references directly                   |
 
 #### 2. The Native Function Calling Workflow
 
@@ -957,6 +966,7 @@ def attendance_required(current: int, total: int):
 ```
 
 **Why Type Hints and Docstrings Matter:**
+
 - **Docstrings:** Tell the LLM **what** the tool does and **when** to choose it.
 - **Type Hints (`a: float, b: float`):** Tell the LLM **what data types** to pass for each argument.
 - **Parameter Names (`current`, `total`):** Help the LLM extract the correct values from user text.
@@ -1103,6 +1113,7 @@ print(f"AI: {response.text}")
 ### What was built
 
 A **Smart Student AI Assistant** that combines everything from Days 6–8 into one unified agent:
+
 - Persistent conversation memory (chat history)
 - Long-term personal notes memory
 - Native function calling with multiple tools
@@ -1126,15 +1137,16 @@ Day 9 brings together three pillars: **Memory + Notes + Tools** into a single st
 └─────────────┴──────────────┴────────────────┘
 ```
 
-| Component          | Purpose                                   | Storage           |
-|--------------------|-------------------------------------------|-------------------|
-| **Chat Memory**    | Remember previous conversation turns      | `chat_history.json` |
-| **Notes Memory**   | Store long-term personal facts & reminders| `notes.json`        |
-| **Native Tools**   | Execute deterministic calculations        | Python functions    |
+| Component        | Purpose                                    | Storage             |
+| ---------------- | ------------------------------------------ | ------------------- |
+| **Chat Memory**  | Remember previous conversation turns       | `chat_history.json` |
+| **Notes Memory** | Store long-term personal facts & reminders | `notes.json`        |
+| **Native Tools** | Execute deterministic calculations         | Python functions    |
 
 #### 2. Two Types of Memory
 
 **Short-term memory** (Chat History) — the conversation so far:
+
 ```python
 history = [
     {"role": "user", "text": "Add 25 and 30"},
@@ -1143,6 +1155,7 @@ history = [
 ```
 
 **Long-term memory** (Notes) — facts that persist across conversations:
+
 ```python
 notes = ["My favorite language is Python"]
 ```
@@ -1269,6 +1282,7 @@ response = client.models.generate_content(
 ```
 
 **What the AI actually sees:**
+
 ```
 User Notes:
 - My favorite language is Python
@@ -1325,11 +1339,11 @@ User Input
 
 #### 8. Why Long-Term Memory Matters for Agentic AI
 
-| Without Notes Memory | With Notes Memory |
-|---------------------|-------------------|
+| Without Notes Memory                       | With Notes Memory                                 |
+| ------------------------------------------ | ------------------------------------------------- |
 | AI forgets preferences after clearing chat | "My favorite language is Python" persists forever |
-| User must repeat context | Agent reads notes and knows user's background |
-| Feels like a new stranger each time | Feels like a personal assistant that knows you |
+| User must repeat context                   | Agent reads notes and knows user's background     |
+| Feels like a new stranger each time        | Feels like a personal assistant that knows you    |
 
 Real-world AI assistants (Siri, Google Assistant, Alexa) maintain user profiles and preferences — this is the same concept, implemented from scratch.
 
@@ -1340,6 +1354,7 @@ Real-world AI assistants (Siri, Google Assistant, Alexa) maintain user profiles 
 ### What was built
 
 A **Knowledge Retrieval & Document QA System (RAG)** featuring two implementations:
+
 1. **Text RAG Chatbot (`rag_chatbot_txt.py`)**: Answers questions from a local plain-text knowledge base (`notes.txt`) by dynamically extracting, vectorizing, and ranking text paragraphs.
 2. **PDF RAG Chatbot (`rag_chatbot_pdf.py`)**: Reads full PDF documents (`document.pdf`), extracts text page-by-page using `pypdf`, splits them into uniform 500-character chunks, indexes them with TF-IDF vectors, performs Cosine Similarity search to find the most relevant chunk, and injects that context into Gemini for strictly grounded answers.
 
@@ -1349,13 +1364,13 @@ A **Knowledge Retrieval & Document QA System (RAG)** featuring two implementatio
 
 RAG is an AI architectural pattern that combines **information retrieval** (searching an external knowledge base) with **LLM generation** (generating natural language answers).
 
-| ❌ Limitations of Pure LLMs | ✅ How RAG Solves It |
-|---|---|
-| • Knowledge cutoff date | • Dynamic access to live, updated data |
-| • Hallucinates missing facts | • Grounded in real source text |
-| • No access to private documents | • Connects your private files & databases |
-| • Expensive to fine-tune on new data | • Zero model retraining needed |
-| • Context window & token limits | • Retrieves and sends only relevant snippets |
+| ❌ Limitations of Pure LLMs          | ✅ How RAG Solves It                         |
+| ------------------------------------ | -------------------------------------------- |
+| • Knowledge cutoff date              | • Dynamic access to live, updated data       |
+| • Hallucinates missing facts         | • Grounded in real source text               |
+| • No access to private documents     | • Connects your private files & databases    |
+| • Expensive to fine-tune on new data | • Zero model retraining needed               |
+| • Context window & token limits      | • Retrieves and sends only relevant snippets |
 
 #### 2. The Complete RAG Architecture & Pipeline
 
@@ -1406,6 +1421,7 @@ A standard RAG pipeline consists of two distinct workflows: **Ingestion / Indexi
 Before text can be searched, it must be extracted into plain text.
 
 **A. Plain Text Files (`open`):**
+
 ```python
 with open("notes.txt", "r", encoding="utf-8") as file:
     text = file.read()
@@ -1430,13 +1446,14 @@ for page in reader.pages:
 
 LLMs have token limits, and sending an entire 100-page document for a simple question is inefficient, slow, and expensive. **Chunking** breaks large documents into smaller, searchable pieces.
 
-| Chunking Strategy | Implementation | Best For |
-|---|---|---|
-| **Paragraph Splitting** | `text.split("\n\n")` | Structured text with clear topic boundaries |
-| **Fixed-Character Windows** | `range(0, len(text), chunk_size)` | Long continuous documents, PDF extractions |
-| **Sliding Window with Overlap** | `chunk_size` with `overlap` | Preserving context across chunk boundaries |
+| Chunking Strategy               | Implementation                    | Best For                                    |
+| ------------------------------- | --------------------------------- | ------------------------------------------- |
+| **Paragraph Splitting**         | `text.split("\n\n")`              | Structured text with clear topic boundaries |
+| **Fixed-Character Windows**     | `range(0, len(text), chunk_size)` | Long continuous documents, PDF extractions  |
+| **Sliding Window with Overlap** | `chunk_size` with `overlap`       | Preserving context across chunk boundaries  |
 
 **Fixed-Window Chunking Example (Day 10):**
+
 ```python
 chunks = []
 chunk_size = 500
@@ -1449,7 +1466,7 @@ for i in range(0, len(text), chunk_size):
 
 #### 5. Step 3: TF-IDF Vectorization
 
-Computers cannot compare raw strings mathematically. We convert text chunks into numeric vectors using **TF-IDF** (*Term Frequency - Inverse Document Frequency*).
+Computers cannot compare raw strings mathematically. We convert text chunks into numeric vectors using **TF-IDF** (_Term Frequency - Inverse Document Frequency_).
 
 - **TF (Term Frequency):** Measures how frequently a word appears inside a specific chunk.
 - **IDF (Inverse Document Frequency):** Measures how rare or unique a word is across all chunks. Common words like "the", "is" get low weights; unique domain keywords get high weights.
@@ -1513,6 +1530,7 @@ response = client.models.generate_content(
 ```
 
 **Why Grounding Rules Matter:**
+
 - **Zero Hallucination:** Prevents the LLM from making up plausible-sounding answers when the information isn't in your document.
 - **Verifiable Answers:** Users can trust that every answer directly references their actual data.
 
@@ -1655,32 +1673,31 @@ Question:
 
 #### 9. Why RAG is Essential for Agentic AI
 
-| Capability | Pure LLM | RAG-Powered Agent |
-|---|---|---|
-| **Private Enterprise Data** | Cannot access proprietary PDFs/DBs | Searches private company documents securely |
-| **Data Freshness** | Outdated by knowledge cutoff | Always queries latest saved documents |
-| **Hallucination Control** | High risk on niche facts | Zero/minimal — answers tied to retrieved context |
-| **Token Efficiency & Cost** | Requires passing massive files | Passes only the exact ~500 character snippet needed |
-| **Explainability & Source Auditing** | Black box generation | Exact source chunk and page can be cited |
+| Capability                           | Pure LLM                           | RAG-Powered Agent                                   |
+| ------------------------------------ | ---------------------------------- | --------------------------------------------------- |
+| **Private Enterprise Data**          | Cannot access proprietary PDFs/DBs | Searches private company documents securely         |
+| **Data Freshness**                   | Outdated by knowledge cutoff       | Always queries latest saved documents               |
+| **Hallucination Control**            | High risk on niche facts           | Zero/minimal — answers tied to retrieved context    |
+| **Token Efficiency & Cost**          | Requires passing massive files     | Passes only the exact ~500 character snippet needed |
+| **Explainability & Source Auditing** | Black box generation               | Exact source chunk and page can be cited            |
 
 ---
 
 ## 🧠 Concepts Progression Summary
 
-| Day | Concept                 | Why It Matters for Agentic AI |
-|-----|-------------------------|-------------------------------|
-| 1   | Python Basics & OOP     | Foundation — everything is built on this |
-| 2   | APIs & JSON             | AI models communicate through APIs returning JSON |
-| 3   | First LLM API call      | Core skill — calling AI models from code |
-| 4   | Prompt Engineering      | Better prompts = better AI output |
-| 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions |
-| 6   | Memory & Persistence    | Real AI assistants remember past conversations |
-| 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code) |
-| 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions |
-| 9   | Long-Term Memory Agent  | Unified agent with notes memory + chat memory + native tools — a true personal assistant |
+| Day | Concept                 | Why It Matters for Agentic AI                                                                 |
+| --- | ----------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | Python Basics & OOP     | Foundation — everything is built on this                                                      |
+| 2   | APIs & JSON             | AI models communicate through APIs returning JSON                                             |
+| 3   | First LLM API call      | Core skill — calling AI models from code                                                      |
+| 4   | Prompt Engineering      | Better prompts = better AI output                                                             |
+| 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions                                           |
+| 6   | Memory & Persistence    | Real AI assistants remember past conversations                                                |
+| 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code)                                            |
+| 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions       |
+| 9   | Long-Term Memory Agent  | Unified agent with notes memory + chat memory + native tools — a true personal assistant      |
 | 10  | RAG (Text & PDF Search) | Grounding LLMs with external knowledge via chunking, TF-IDF vectorization & cosine similarity |
 
 ---
 
 > **Next up:** Day 11 — Advanced Vector Databases & Semantic Embeddings 🚀
-
