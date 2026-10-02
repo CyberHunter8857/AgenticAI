@@ -7,3 +7,5 @@ python-dotenv
 requests
 scikit-learn
 pypdf
+numpy 
+faiss-cpu
