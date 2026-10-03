@@ -1686,19 +1686,19 @@ Question:
 
 ## 🧠 Concepts Progression Summary
 
-| Day | Concept                 | Why It Matters for Agentic AI                                                                 |
-| --- | ----------------------- | --------------------------------------------------------------------------------------------- |
-| 1   | Python Basics & OOP     | Foundation — everything is built on this                                                      |
-| 2   | APIs & JSON             | AI models communicate through APIs returning JSON                                             |
-| 3   | First LLM API call      | Core skill — calling AI models from code                                                      |
-| 4   | Prompt Engineering      | Better prompts = better AI output                                                             |
-| 5   | Structured Outputs      | Agents need JSON, not paragraphs, to make decisions                                           |
-| 6   | Memory & Persistence    | Real AI assistants remember past conversations                                                |
-| 7   | Tool Calling & Agents   | Separation of reasoning (LLM) and execution (code)                                            |
-| 8   | Native Function Calling | Production agent architecture — Gemini directly registers and executes Python functions       |
-| 9   | Long-Term Memory Agent  | Unified agent with notes memory + chat memory + native tools — a true personal assistant      |
-| 10  | RAG (Text & PDF Search) | Grounding LLMs with external knowledge via chunking, TF-IDF vectorization & cosine similarity |
-| 11  | Vector Embeddings & FAISS | Production-grade semantic search with neural embeddings and efficient similarity indexing   |
+| Day | Concept                   | Why It Matters for Agentic AI                                                                 |
+| --- | ------------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | Python Basics & OOP       | Foundation — everything is built on this                                                      |
+| 2   | APIs & JSON               | AI models communicate through APIs returning JSON                                             |
+| 3   | First LLM API call        | Core skill — calling AI models from code                                                      |
+| 4   | Prompt Engineering        | Better prompts = better AI output                                                             |
+| 5   | Structured Outputs        | Agents need JSON, not paragraphs, to make decisions                                           |
+| 6   | Memory & Persistence      | Real AI assistants remember past conversations                                                |
+| 7   | Tool Calling & Agents     | Separation of reasoning (LLM) and execution (code)                                            |
+| 8   | Native Function Calling   | Production agent architecture — Gemini directly registers and executes Python functions       |
+| 9   | Long-Term Memory Agent    | Unified agent with notes memory + chat memory + native tools — a true personal assistant      |
+| 10  | RAG (Text & PDF Search)   | Grounding LLMs with external knowledge via chunking, TF-IDF vectorization & cosine similarity |
+| 11  | Vector Embeddings & FAISS | Production-grade semantic search with neural embeddings and efficient similarity indexing     |
 
 ---
 
@@ -1718,10 +1718,12 @@ Question:
 **Vector embeddings** convert text into high-dimensional numerical vectors that capture semantic meaning.
 
 **Simple Analogy:**
+
 - TF-IDF (Day 10) = Counting how many times words appear (keyword matching)
 - Embeddings (Day 11) = Understanding what words **mean** (semantic matching)
 
 **Example:**
+
 ```
 "dog" and "puppy" → Very similar vectors (close in meaning)
 "dog" and "chair" → Very different vectors (unrelated)
@@ -1731,14 +1733,14 @@ Even though "puppy" and "dog" share no letters, their embeddings are close becau
 
 #### 2. From TF-IDF to Neural Embeddings
 
-| Feature            | TF-IDF (Day 10)                       | Neural Embeddings (Day 11)                    |
-| ------------------ | ------------------------------------- | --------------------------------------------- |
-| **How it works**   | Counts word frequency                 | Deep learning model understands meaning       |
-| **Similarity**     | Exact keyword match                   | Semantic similarity                           |
-| **Synonyms**       | "car" ≠ "automobile"                  | "car" ≈ "automobile" (vectors are close)      |
-| **Dimensions**     | 1000s (vocabulary size)               | 768-3072 (dense representation)               |
-| **Speed**          | Fast (simple math)                    | Requires embedding model                      |
-| **Best for**       | Keyword search, small datasets        | Semantic search, large-scale production       |
+| Feature          | TF-IDF (Day 10)                | Neural Embeddings (Day 11)               |
+| ---------------- | ------------------------------ | ---------------------------------------- |
+| **How it works** | Counts word frequency          | Deep learning model understands meaning  |
+| **Similarity**   | Exact keyword match            | Semantic similarity                      |
+| **Synonyms**     | "car" ≠ "automobile"           | "car" ≈ "automobile" (vectors are close) |
+| **Dimensions**   | 1000s (vocabulary size)        | 768-3072 (dense representation)          |
+| **Speed**        | Fast (simple math)             | Requires embedding model                 |
+| **Best for**     | Keyword search, small datasets | Semantic search, large-scale production  |
 
 **When Query = "What are AI applications?"**
 
@@ -1750,6 +1752,7 @@ Even though "puppy" and "dog" share no letters, their embeddings are close becau
 **FAISS** (Facebook AI Similarity Search) is a library for efficient similarity search over vector embeddings.
 
 **Why FAISS?**
+
 - ✅ **Blazing Fast:** Optimized for millions/billions of vectors
 - ✅ **Memory Efficient:** Uses specialized indexing algorithms
 - ✅ **Production-Ready:** Used by Meta, Google, Netflix
@@ -1757,13 +1760,13 @@ Even though "puppy" and "dog" share no letters, their embeddings are close becau
 
 **FAISS vs ChromaDB (Day 10 alternative):**
 
-| Aspect              | ChromaDB                       | FAISS                           |
-| ------------------- | ------------------------------ | ------------------------------- |
-| **Level**           | High-level, batteries-included | Low-level, manual management    |
-| **Persistence**     | Built-in                       | Manual save/load                |
-| **Metadata**        | Full support                   | Track separately                |
-| **Speed**           | Good                           | Faster (optimized C++)          |
-| **Use Case**        | General RAG, prototypes        | Production systems, large-scale |
+| Aspect          | ChromaDB                       | FAISS                           |
+| --------------- | ------------------------------ | ------------------------------- |
+| **Level**       | High-level, batteries-included | Low-level, manual management    |
+| **Persistence** | Built-in                       | Manual save/load                |
+| **Metadata**    | Full support                   | Track separately                |
+| **Speed**       | Good                           | Faster (optimized C++)          |
+| **Use Case**    | General RAG, prototypes        | Production systems, large-scale |
 
 #### 4. The Complete RAG Pipeline (Day 11)
 
@@ -1834,6 +1837,7 @@ print(f"Characters: {len(pdf_text)}")
 ```
 
 **Output:**
+
 ```
 Pages: 60
 Characters: 79161
@@ -1847,19 +1851,19 @@ def create_chunks(text, chunk_size=1000):
     chunks = []
     current_chunk = []
     current_length = 0
-    
+
     for word in words:
         current_chunk.append(word)
         current_length += len(word) + 1
-        
+
         if current_length >= chunk_size:
             chunks.append(" ".join(current_chunk))
             current_chunk = []
             current_length = 0
-    
+
     if current_chunk:
         chunks.append(" ".join(current_chunk))
-    
+
     return chunks
 
 chunks = create_chunks(pdf_text)
@@ -1867,11 +1871,13 @@ print(f"Total chunks: {len(chunks)}")
 ```
 
 **Output:**
+
 ```
 Total chunks: 76
 ```
 
 **Why word-based chunking?**
+
 - Avoids splitting mid-word (better than character slicing)
 - Maintains semantic units
 - Configurable chunk size
@@ -1893,7 +1899,7 @@ embedding_response = client.models.embed_content(
 )
 
 embeddings = [
-    embedding.values 
+    embedding.values
     for embedding in embedding_response.embeddings
 ]
 
@@ -1901,11 +1907,13 @@ print(f"Embeddings shape: {len(embeddings)} × {len(embeddings[0])}")
 ```
 
 **Output:**
+
 ```
 Embeddings shape: 76 × 3072
 ```
 
 **Key Details:**
+
 - `gemini-embedding-001` → 3072-dimensional vectors
 - `RETRIEVAL_DOCUMENT` → Optimized for document indexing
 - Each chunk → One 3072-dim vector
@@ -1930,11 +1938,13 @@ print(f"Vectors stored: {index.ntotal}")
 ```
 
 **Output:**
+
 ```
 Vectors stored: 76
 ```
 
 **What is IndexFlatL2?**
+
 - **Flat:** Exact search (no approximation)
 - **L2:** Euclidean distance metric
 - **Best for:** Small to medium datasets (up to ~1M vectors)
@@ -1951,31 +1961,32 @@ def search_pdf(query, top_k=3):
             task_type="RETRIEVAL_QUERY"  # For search queries
         )
     )
-    
+
     query_vector = np.array(
         [query_response.embeddings[0].values],
         dtype="float32"
     )
-    
+
     # Search FAISS index
     distances, indices = index.search(query_vector, top_k)
-    
+
     # Collect results
     results = []
     for distance, idx in zip(distances[0], indices[0]):
         if idx == -1:
             continue
-        
+
         results.append({
             "text": chunks[idx],
             "distance": float(distance),
             "chunk": int(idx)
         })
-    
+
     return results
 ```
 
 **Key Point:** `RETRIEVAL_QUERY` vs `RETRIEVAL_DOCUMENT`
+
 - Different task types optimize embeddings differently
 - Query embeddings are optimized for matching against document embeddings
 - Improves retrieval accuracy
@@ -1986,11 +1997,11 @@ def search_pdf(query, top_k=3):
 def generate_answer(query, results):
     # Combine retrieved chunks
     context = "\n\n".join(result["text"] for result in results)
-    
+
     prompt = f"""
 You are a helpful PDF question-answering assistant.
 
-Answer the user's question using ONLY the information 
+Answer the user's question using ONLY the information
 provided in the context.
 
 If the answer cannot be found in the context, say:
@@ -2006,12 +2017,12 @@ Keep the answer clear and concise.
 User Question:
 {query}
 """
-    
+
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
         contents=prompt
     )
-    
+
     return response.text
 ```
 
@@ -2034,20 +2045,21 @@ print(f"\n🤖 AI: {answer}")
 ```
 
 **Sample Output:**
+
 ```
 [1] Chunk 11 | Distance: 0.3980
-Retail — Predictive Maintenance: AI agents monitor equipment 
+Retail — Predictive Maintenance: AI agents monitor equipment
 health, predict potential failures, and schedule maintenance...
 
 [2] Chunk 13 | Distance: 0.4169
-Network Optimization: AI monitors network performance in 
+Network Optimization: AI monitors network performance in
 real-time, detecting issues and automatically adjusting...
 
 [3] Chunk 27 | Distance: 0.4227
-Healthcare AI diagnostic tools, virtual health assistants, 
+Healthcare AI diagnostic tools, virtual health assistants,
 radiology AI, personalized treatment plans...
 
-🤖 AI: Based on the provided context, the use cases of 
+🤖 AI: Based on the provided context, the use cases of
 agentic AI include:
 - Retail: Predictive Maintenance, Supply Chain Optimization
 - Manufacturing: Patient Monitoring
@@ -2066,12 +2078,14 @@ distance = sqrt(sum((a - b)² for a, b in zip(vec1, vec2)))
 ```
 
 **Interpretation:**
+
 - **Lower distance = Higher similarity**
 - Distance 0.0 = Identical vectors
 - Distance 0.3-0.5 = Very similar (good match)
 - Distance > 1.0 = Different (poor match)
 
 **Example from results:**
+
 ```
 Distance: 0.3980 → Excellent match
 Distance: 0.4169 → Good match
@@ -2080,14 +2094,15 @@ Distance: 0.4227 → Good match
 
 #### 7. Advanced FAISS Index Types
 
-| Index Type      | Description                        | Speed     | Accuracy | Best For          |
-| --------------- | ---------------------------------- | --------- | -------- | ----------------- |
-| `IndexFlatL2`   | Exact search (brute force)         | Slow      | 100%     | < 1M vectors      |
-| `IndexIVFFlat`  | Inverted file index                | Fast      | ~95%     | 1M-10M vectors    |
-| `IndexHNSWFlat` | Hierarchical graph index           | Very Fast | ~99%     | 10M-100M vectors  |
-| `IndexIVFPQ`    | Product quantization (compressed)  | Very Fast | ~90%     | 100M+ vectors     |
+| Index Type      | Description                       | Speed     | Accuracy | Best For         |
+| --------------- | --------------------------------- | --------- | -------- | ---------------- |
+| `IndexFlatL2`   | Exact search (brute force)        | Slow      | 100%     | < 1M vectors     |
+| `IndexIVFFlat`  | Inverted file index               | Fast      | ~95%     | 1M-10M vectors   |
+| `IndexHNSWFlat` | Hierarchical graph index          | Very Fast | ~99%     | 10M-100M vectors |
+| `IndexIVFPQ`    | Product quantization (compressed) | Very Fast | ~90%     | 100M+ vectors    |
 
 **For production at scale:**
+
 ```python
 # IVF index with 100 clusters (faster search)
 quantizer = faiss.IndexFlatL2(dimension)
@@ -2100,15 +2115,15 @@ index.add(vectors)
 
 #### 8. RAG Evolution: Day 10 vs Day 11
 
-| Aspect                | Day 10 (TF-IDF)                  | Day 11 (Embeddings + FAISS)           |
-| --------------------- | -------------------------------- | ------------------------------------- |
-| **Search Method**     | Keyword matching                 | Semantic similarity                   |
-| **Vector Store**      | None (in-memory scores)          | FAISS index                           |
-| **Handles Synonyms**  | ❌ No                            | ✅ Yes                                |
-| **Semantic Search**   | ❌ No                            | ✅ Yes                                |
-| **Scalability**       | Poor (recalculate every query)   | Excellent (pre-indexed)               |
-| **Production Ready**  | No                               | Yes                                   |
-| **Best Use**          | Simple keyword search, prototypes| Real-world RAG systems, chatbots      |
+| Aspect               | Day 10 (TF-IDF)                   | Day 11 (Embeddings + FAISS)      |
+| -------------------- | --------------------------------- | -------------------------------- |
+| **Search Method**    | Keyword matching                  | Semantic similarity              |
+| **Vector Store**     | None (in-memory scores)           | FAISS index                      |
+| **Handles Synonyms** | ❌ No                             | ✅ Yes                           |
+| **Semantic Search**  | ❌ No                             | ✅ Yes                           |
+| **Scalability**      | Poor (recalculate every query)    | Excellent (pre-indexed)          |
+| **Production Ready** | No                                | Yes                              |
+| **Best Use**         | Simple keyword search, prototypes | Real-world RAG systems, chatbots |
 
 **Example Query:** "How is AI used in hospitals?"
 
@@ -2118,14 +2133,14 @@ index.add(vectors)
 
 #### 9. When to Use Each Approach
 
-| Use Case                           | Recommendation           |
-| ---------------------------------- | ------------------------ |
-| Quick prototype, small dataset     | TF-IDF (Day 10)          |
-| Production chatbot, customer docs  | Embeddings + FAISS       |
-| Exact keyword search required      | TF-IDF                   |
-| Understanding user intent          | Embeddings               |
-| Budget-constrained (no API calls)  | TF-IDF                   |
-| Need semantic understanding        | Embeddings               |
+| Use Case                          | Recommendation     |
+| --------------------------------- | ------------------ |
+| Quick prototype, small dataset    | TF-IDF (Day 10)    |
+| Production chatbot, customer docs | Embeddings + FAISS |
+| Exact keyword search required     | TF-IDF             |
+| Understanding user intent         | Embeddings         |
+| Budget-constrained (no API calls) | TF-IDF             |
+| Need semantic understanding       | Embeddings         |
 
 #### 10. Common RAG Improvements
 
@@ -2137,13 +2152,13 @@ def create_chunks_with_overlap(text, chunk_size=1000, overlap=100):
     words = text.split()
     chunks = []
     start = 0
-    
+
     while start < len(words):
         end = start + chunk_size
         chunk = " ".join(words[start:end])
         chunks.append(chunk)
         start += chunk_size - overlap  # Overlap previous chunk
-    
+
     return chunks
 ```
 
@@ -2170,6 +2185,7 @@ Combine keyword (TF-IDF) + semantic (embeddings) search for best of both worlds.
 #### 11. Saving and Loading FAISS Index
 
 **Save index to disk:**
+
 ```python
 faiss.write_index(index, "my_index.faiss")
 
@@ -2180,6 +2196,7 @@ with open("chunks.pkl", "wb") as f:
 ```
 
 **Load index later:**
+
 ```python
 index = faiss.read_index("my_index.faiss")
 
