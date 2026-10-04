@@ -1699,6 +1699,7 @@ Question:
 | 9   | Long-Term Memory Agent    | Unified agent with notes memory + chat memory + native tools — a true personal assistant      |
 | 10  | RAG (Text & PDF Search)   | Grounding LLMs with external knowledge via chunking, TF-IDF vectorization & cosine similarity |
 | 11  | Vector Embeddings & FAISS | Production-grade semantic search with neural embeddings and efficient similarity indexing     |
+| 12  | Source-Aware PDF RAG      | Page-aware chunking, chunk overlap, metadata, source attribution — production-grade RAG      |
 
 ---
 
@@ -2203,6 +2204,177 @@ index = faiss.read_index("my_index.faiss")
 with open("chunks.pkl", "rb") as f:
     chunks = pickle.load(f)
 ```
+
+---
+
+## Day 12 — Source-Aware PDF RAG
+
+### What was built
+
+A production-grade RAG chatbot that answers questions from a PDF and cites the **exact page** each answer came from. Built on the Day 11 FAISS pipeline with three major upgrades: page-aware chunking, chunk overlap, and full metadata tracking.
+
+### Configuration
+
+```python
+EMBEDDING_MODEL = "gemini-embedding-001"
+GENERATION_MODEL = "gemini-3.5-flash-lite"
+CHUNK_SIZE    = 200   # words
+CHUNK_OVERLAP = 40    # words shared with next chunk
+TOP_K = 3
+```
+
+### Core Concepts
+
+#### 1. Page-Aware Chunking
+
+Day 11 extracted the whole PDF as one text blob and chunked it — so chunks had no page information.
+
+Day 12 extracts **each page separately** with `PyPDF`, then chunks each page independently. Every chunk therefore knows its page:
+
+```python
+def load_pdf(pdf_file):
+    reader = PdfReader(pdf_file)
+    pages = []
+
+    for page_number, page in enumerate(reader.pages, start=1):
+        text = page.extract_text()
+
+        if text and text.strip():
+            pages.append({"page": page_number, "text": text.strip()})
+
+    return pages
+```
+
+#### 2. Overlapping Chunks
+
+```
+CHUNK_SIZE = 200 words, CHUNK_OVERLAP = 40 words
+
+Chunk 0: words   0 → 200
+Chunk 1: words 160 → 360   ← 40-word overlap
+Chunk 2: words 320 → 520   ← 40-word overlap
+```
+
+The overlap loop:
+
+```python
+start = 0
+while start < len(words):
+    end = start + CHUNK_SIZE
+    chunk_text = " ".join(words[start:end])
+    chunks.append({...})
+
+    if end >= len(words):
+        break
+
+    start = end - CHUNK_OVERLAP   # step back by overlap amount
+```
+
+**Why overlap?** If a key sentence straddles two chunk boundaries, naive chunking splits it and loses context. Overlap guarantees at least one chunk contains the full sentence.
+
+#### 3. Chunk Metadata
+
+```python
+{
+    "chunk_id": 12,
+    "page": 5,
+    "source": "document.pdf",
+    "text": "..."
+}
+```
+
+Metadata is attached at creation time and flows untouched through embedding → FAISS → retrieval → display.
+
+#### 4. Context Format
+
+The context passed to Gemini explicitly labels each chunk with its ID and page:
+
+```python
+f"""
+[Chunk {metadata['chunk_id']} | Page {metadata['page']}]
+
+{metadata['text']}
+"""
+```
+
+This makes it easy for the LLM to reference specific chunks if needed, and makes debugging straightforward.
+
+#### 5. Source Attribution
+
+After every answer, deduplicated sources are printed:
+
+```python
+def get_sources(results):
+    seen = set()
+    sources = []
+
+    for result in results:
+        key = (result["metadata"]["source"], result["metadata"]["page"])
+
+        if key not in seen:
+            seen.add(key)
+            sources.append({
+                "source": result["metadata"]["source"],
+                "page": result["metadata"]["page"]
+            })
+
+    return sources
+```
+
+Output:
+```
+📚 Sources:
+[1] document.pdf — Page 5
+[2] document.pdf — Page 12
+```
+
+#### 6. Retrieval Distance Display
+
+```
+🔎 Retrieval distances:
+Chunk 12 | Page 5  | Distance: 0.3421
+Chunk 31 | Page 12 | Distance: 0.4102
+Chunk 47 | Page 12 | Distance: 0.5087
+```
+
+| Distance    | Meaning         |
+| ----------- | --------------- |
+| 0.0 – 0.35  | Excellent match |
+| 0.35 – 0.55 | Good match      |
+| 0.55 – 0.80 | Weak match      |
+| > 0.80      | Poor match      |
+
+### Pipeline Comparison
+
+| Aspect              | Day 10 (TF-IDF)         | Day 11 (FAISS)          | Day 12 (Source-Aware)      |
+| ------------------- | ----------------------- | ----------------------- | -------------------------- |
+| **Search Method**   | Keyword                 | Semantic                | Semantic                   |
+| **Chunking**        | Flat text               | Flat text               | Page-aware + overlapping   |
+| **Metadata**        | ❌                      | ❌                      | ✅ chunk_id, page, source  |
+| **Source Citation** | ❌                      | ❌                      | ✅ File + page per answer  |
+| **Overlap**         | ❌                      | ❌                      | ✅ 40-word overlap         |
+| **Production Ready**| No                      | Partial                 | Yes                        |
+
+### Key Learnings
+
+1. **Page-aware chunking** is the minimum requirement for source citation — without it you can't say where an answer came from.
+
+2. **Chunk overlap** is a quick, cheap improvement. A 15–20% overlap (40 words on 200-word chunks) is a good default.
+
+3. **Metadata should be attached at chunk creation** — retrofitting it later is painful. Design your chunk schema upfront.
+
+4. **Source attribution** is what turns a RAG demo into a production tool. Users trust grounded answers; auditors need them.
+
+5. **Distance scores** are your debugging window into retrieval — always log them during development to understand what the model is actually finding.
+
+### Next Steps
+
+- [ ] Persist FAISS index (`faiss.write_index`) to avoid re-embedding on every run
+- [ ] Support multiple PDFs (add a `document_id` to metadata)
+- [ ] Re-ranking: retrieve top 10, rerank, use top 3
+- [ ] Hybrid search: combine semantic + keyword scoring
+- [ ] Stream answers token-by-token
+- [ ] Add a Streamlit / FastAPI frontend
 
 ---
 
